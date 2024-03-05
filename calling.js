@@ -7,7 +7,7 @@ const mongoose = require('mongoose');
 mongoose.set('strictQuery', false);
 const DB = process.env.DATABASE;
 const Link_data = require('./Link');
-const PORT = process.env.PORT;
+const PORT = process.env.PORT || 5000;
 require('./pdfGenerator')
 
 
@@ -23,8 +23,6 @@ mongoose.connect(DB  , {
 })
 .then(() => {
   console.log('Connected to MongoDB');
-
-
 
 const PDFDocument = require('pdfkit');
 const fs = require('fs');
