@@ -3,7 +3,6 @@ const axios = require('axios');
 const cheerio = require('cheerio'); 
 const app = express();
 const cors = require('cors');
-const urlModule = require('url');
 const bodyParser = require('body-parser');
 const fs = require('fs'); 
 require('dotenv').config(); 
@@ -19,13 +18,13 @@ const { URL } = require('url');
 async function scrap(url, parent = null, baseUrl, visitedUrls) {
   try {
       if (visitedUrls.has(url)) {
-          console.log(`URL already visited: ${url}`);
+        //   console.log(`URL already visited: ${url}`);
           return;
       }
 
       visitedUrls.add(url);
       const absoluteUrl = new URL(url, baseUrl);
-      console.log(`Scraping URL: ${absoluteUrl.href}`);
+    //   console.log(`Scraping URL: ${absoluteUrl.href}`);
       fs.appendFileSync('output.txt', absoluteUrl.href + '\n');
 
       const response = await axios.get(absoluteUrl.href);
@@ -41,7 +40,7 @@ async function scrap(url, parent = null, baseUrl, visitedUrls) {
           }
       });
   } catch (error) {
-      console.error('Error scraping URL:', url, error);
+      console.error('Error scraping URL:');
   }
 }
 

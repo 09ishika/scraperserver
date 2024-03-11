@@ -1,3 +1,12 @@
 node_modules
 
+index.js
+output.txt
+output2.txt
+data.json
+data.pdf
+
+Link.js
+db
+pdfGenerator.js
 .env

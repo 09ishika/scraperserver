@@ -179,15 +179,20 @@ const bodyParser = require('body-parser');
 require('dotenv').config(); 
 const scrap = require('./scraper1');
 const pdf = require('html-pdf');
+const Json2csvParser = require('json2csv').Parser;
 const axios = require('axios')
 app.use(cors()); 
+const request = require('request-promise');
 app.use(express.urlencoded({ extended: true })); 
 app.use(express.json()); 
 PORT =5002; 
 app.use(bodyParser.json()); 
-app.use(cors()) 
 const fs = require('fs'); 
 const { URL } = require('url');
+const cheerio = require('cheerio');
+
+
+
 
 
 app.post('/scrape', async (req, res) => {
@@ -220,6 +225,59 @@ app.get('/urls', (req, res) => {
       res.status(500).json({ error: 'An error occurred while reading the output file' });
   }
 });
+
+app.post('/scrapes', async (req, res) => {
+  const { urls, selectors } = req.body;
+  let pages = [];
+
+  for (let article of urls) {
+    const response = await request({
+      uri: article.trim(),
+      gzip: true,
+    });
+
+    let $ = cheerio.load(response);
+
+    let pageData = {};
+
+    selectors.forEach((selector) => {
+      let values = [];
+      $(selector).each((index, element) => {
+        values.push($(element).text().trim());
+      });
+      pageData[selector] = values;
+    });
+
+    pages.push(pageData);
+  }
+   
+
+  fs.writeFileSync('./data.json', JSON.stringify(pages), 'utf-8');
+
+  const tableString = getTableString(pages);
+  const outputPath = './output2.txt';
+  fs.writeFileSync(outputPath, tableString, 'utf-8');
+
+  res.json({ tableString, pages });
+
+  const fields = selectors;
+  const json2csvParser = new Json2csvParser({ fields });
+  const csv = json2csvParser.parse(pages);
+  // console.log(csv);
+
+  console.table(pages);
+});
+
+function getTableString(pages) {
+  let tableString = '';
+  pages.forEach((page) => {
+    for (let key in page) {
+      tableString += `\n ${key}: \n \n  ${page[key].join('\n')}\n`; 
+    }
+    tableString += '\n'.repeat(3);
+  });
+  return tableString;
+}
     app.listen(PORT, () => { 
       console.log('Server running on port 5000'); 
     });
