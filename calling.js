@@ -185,7 +185,7 @@ app.use(cors());
 const request = require('request-promise');
 app.use(express.urlencoded({ extended: true })); 
 app.use(express.json()); 
-PORT =5002; 
+PORT = process.env.PORT||5002; 
 app.use(bodyParser.json()); 
 const fs = require('fs'); 
 const { URL } = require('url');
